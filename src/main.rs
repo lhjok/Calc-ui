@@ -194,7 +194,8 @@ pub fn main() {
         .window_size((223., 300.))
         .resizable(false)
         .title(
-            LocalizedString::new("calc-window-title").with_placeholder("Simple Calculator"),
+            LocalizedString::new("calc-window-title")
+            .with_placeholder("Simple Calculator"),
         );
     let calc_state = CalcState {
         value: "0".to_string(),
