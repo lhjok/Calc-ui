@@ -45,16 +45,16 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                         data.value = label.clone();
                     } else { data.value += &label; }
                 },
-                'C' => { data.value = "0".to_string(); },
+                'C' => { data.value = String::from("0"); },
                 '←' => {
                     if data.value.len() == 1 {
-                        data.value = "0".to_string();
+                        data.value = String::from("0");
                     } else { data.value.pop(); }
                 },
                 '=' => {
                     data.state = State::Set;
                     if data.value.len() == 1 && data.value == "0" {
-                        data.value = "0".to_string();
+                        data.value = String::from("0");
                     } else {
                         match Calc::new(data.value.clone()).run_round(Some(7)) {
                             Ok(valid) => data.value = valid,
@@ -64,7 +64,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                 },
                 '.' => {
                     if let State::Set = data.state {
-                        data.value = "0".to_string();
+                        data.value = String::from("0");
                         data.state = State::Non;
                     } else { data.value += &label; }
                 },
@@ -141,38 +141,38 @@ fn build_calc() -> impl Widget<CalcState> {
         .with_flex_child(
             flex_row(
                 op_button('C'),
-                op_button_label('π', "P".to_string()),
+                op_button_label('π', String::from("P")),
                 op_button('←'),
-                op_button_label('÷', '/'.to_string()),
+                op_button_label('÷', String::from("/")),
             ),
             1.0,
         )
         .with_spacer(1.0)
         .with_flex_child(
             flex_row(
-                digit_button(7.to_string()),
-                digit_button(8.to_string()),
-                digit_button(9.to_string()),
-                op_button_label('×', '*'.to_string()),
+                digit_button(String::from("7")),
+                digit_button(String::from("8")),
+                digit_button(String::from("9")),
+                op_button_label('×', String::from("*")),
             ),
             1.0,
         )
         .with_spacer(1.0)
         .with_flex_child(
             flex_row(
-                digit_button(4.to_string()),
-                digit_button(5.to_string()),
-                digit_button(6.to_string()),
-                op_button_label('−', '-'.to_string()),
+                digit_button(String::from("4")),
+                digit_button(String::from("5")),
+                digit_button(String::from("6")),
+                op_button_label('−', String::from("-")),
             ),
             1.0,
         )
         .with_spacer(1.0)
         .with_flex_child(
             flex_row(
-                digit_button(1.to_string()),
-                digit_button(2.to_string()),
-                digit_button(3.to_string()),
+                digit_button(String::from("1")),
+                digit_button(String::from("2")),
+                digit_button(String::from("3")),
                 op_button('+'),
             ),
             1.0,
@@ -181,7 +181,7 @@ fn build_calc() -> impl Widget<CalcState> {
         .with_flex_child(
             flex_row(
                 op_button('%'),
-                digit_button(0.to_string()),
+                digit_button(String::from("0")),
                 op_button('.'),
                 op_button('='),
             ),
@@ -195,10 +195,10 @@ pub fn main() {
         .resizable(false)
         .title(
             LocalizedString::new("calc-window-title")
-            .with_placeholder("Simple Calculator"),
+            .with_placeholder("Simple Calculator")
         );
     let calc_state = CalcState {
-        value: "0".to_string(),
+        value: String::from("0"),
         state: State::Non
     };
     AppLauncher::with_window(window)
