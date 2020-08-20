@@ -38,6 +38,7 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
         .on_click(move |_ctx, data: &mut CalcState, _env| {
             if data.value.len() == 1 && data.value == "0" {
                 data.value = label.clone();
+                data.state = State::Non;
             } else if let State::Set = data.state {
                 data.value += &label;
                 data.state = State::Non;
@@ -96,12 +97,19 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                         data.state = State::Non;
                     } else { data.value += &label; }
                 },
+                '(' => {
+                    if data.value.len() == 1 && data.value == "0" {
+                        data.value = label.clone();
+                        data.state = State::Non;
+                    } else if let State::Set = data.state {
+                        data.value += &label;
+                        data.state = State::Non;
+                    } else { data.value += &label; }
+                },
                 _ => {
                     if let State::Set = data.state {
                         data.value += &label;
                         data.state = State::Non;
-                    } else if data.value.len() == 1 && data.value == "0" {
-                        data.value = label.clone();
                     } else { data.value += &label; }
                 },
             }
