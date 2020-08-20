@@ -255,7 +255,7 @@ pub fn main() {
         .resizable(false)
         .title(
             LocalizedString::new("calc-window-title")
-            .with_placeholder("Simple Calculator")
+            .with_placeholder("Senior Calculator")
         );
     let calc_state = CalcState {
         value: String::from("0"),
