@@ -97,7 +97,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                         data.state = State::Non;
                     } else { data.value += &label; }
                 },
-                '(' => {
+                '(' | '−' => {
                     if data.value.len() == 1 && data.value == "0" {
                         data.value = label.clone();
                         data.state = State::Non;
@@ -214,7 +214,7 @@ fn build_calc() -> impl Widget<CalcState> {
                 digit_button(String::from("4")),
                 digit_button(String::from("5")),
                 digit_button(String::from("6")),
-                op_button('−'),
+                op_button_label('−', String::from("-")),
                 fun_button_label("Cosh", String::from("cosh(")),
                 fun_button_label("Sinh", String::from("sinh(")),
                 fun_button_label("Tanh", String::from("tanh(")),
