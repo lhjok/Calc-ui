@@ -36,7 +36,7 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
         .background(painter)
         .expand()
         .on_click(move |_ctx, data: &mut CalcState, _env| {
-            if data.value.len() == 1 && data.value == "0" {
+            if data.value == "0" {
                 data.value = label.clone();
                 data.state = State::Non;
             } else if let State::Set = data.state {
@@ -70,7 +70,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                     if let State::Set = data.state {
                         data.value = label.clone();
                         data.state = State::Non;
-                    } else if data.value.len() == 1 && data.value == "0" {
+                    } else if data.value == "0" {
                         data.value = label.clone();
                     } else { data.value += &label; }
                 },
@@ -82,7 +82,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                 },
                 '=' => {
                     data.state = State::Set;
-                    if data.value.len() == 1 && data.value == "0" {
+                    if data.value == "0" {
                         data.value = String::from("0");
                     } else {
                         match Calc::new(data.value.clone()).run_round(Some(7)) {
@@ -98,7 +98,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                     } else { data.value += &label; }
                 },
                 '(' | '−' => {
-                    if data.value.len() == 1 && data.value == "0" {
+                    if data.value == "0" {
                         data.value = label.clone();
                         data.state = State::Non;
                     } else if let State::Set = data.state {
@@ -142,7 +142,7 @@ fn digit_button(digit: String) -> impl Widget<CalcState> {
             if let State::Set = data.state {
                 data.value = digit.clone();
                 data.state = State::Non;
-            }else if data.value.len() == 1 && data.value == "0" {
+            } else if data.value == "0" {
                 data.value = digit.clone();
             } else { data.value += &digit; }
         })
