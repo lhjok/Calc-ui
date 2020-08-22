@@ -95,7 +95,7 @@ impl Bignum for Float {
 
         let re_bug = |original: &Float, repair: String| -> String {
             if original < &1.0 {  //修复上游Rug库(小于1的Bug）
-                let mut bug= repair.parse::<f64>().unwrap();
+                let mut bug = repair.parse::<f64>().unwrap();
                 while original.to_f64() < bug {
                     bug = format!("{:.6}", bug * 0.1).parse::<f64>().unwrap();
                 }
