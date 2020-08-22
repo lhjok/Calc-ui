@@ -94,9 +94,12 @@ impl Bignum for Float {
         let fix = self.to_string_radix(10, None).clean_zero();
 
         let re_bug = |original: &Float, repair: String| -> String {
-            if original < &1.0 {  //修复上游Rug库的Bug
-                let bug= repair.parse::<f64>().unwrap();
-                return format!("{:.6}", bug * 0.1);
+            if original < &1.0 {  //修复上游Rug库(小于1的Bug）
+                let mut bug= repair.parse::<f64>().unwrap();
+                while original.to_f64() < bug {
+                    bug = format!("{:.6}", bug * 0.1).parse::<f64>().unwrap();
+                }
+                return format!("{:.6}", bug);
             }
             repair
         };
