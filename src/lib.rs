@@ -44,6 +44,7 @@ trait Bignum {
 }
 
 trait Other {
+    fn to_fixed(&self) -> String;
     fn clean_zero(self) -> String;
     fn math(&self, v: Float) -> Result<Float, String>;
     fn extract(&self, n: usize, i: usize) -> Result<Float, String>;
@@ -91,25 +92,9 @@ impl Bignum for Float {
     }
 
     fn to_string_round(&self, digits: Option<usize>) -> String {
-        let fix = self.to_string_radix(10, None).clean_zero();
-
-        let re_bug = |original: &Float, repair: String| -> String {
-            //修复上游Rug库(小于1和大于-1的Bug)
-            if original < &1.0 && original > &0.0 {
-                let mut bug = repair.parse::<f64>().unwrap();
-                while original.to_f64() < bug {
-                    bug = format!("{:.6}", bug * 0.1).parse::<f64>().unwrap();
-                }
-                return format!("{:.6}", bug);
-            } else if original < &0.0 && original > &-1.0 {
-                let mut bug = repair.parse::<f64>().unwrap();
-                while original.to_f64() > bug {
-                    bug = format!("{:.6}", bug * 0.1).parse::<f64>().unwrap();
-                }
-                return format!("{:.6}", bug);
-            }
-            repair
-        };
+        let fix = if self < &1.0 && self > &-1.0 {
+            self.to_string_radix(10, None).to_fixed()
+        } else { self.to_string_radix(10, None).clean_zero() };
 
         match digits {
             None => fix,
@@ -132,17 +117,17 @@ impl Bignum for Float {
                         _ => dig += 1,
                     }
                     if dig < x && i == fix.len()-1 {
-                        return re_bug(self, fix);
+                        return fix;
                     } else if point == true && dig == x && i <= fix.len()-1 {
                         let a = fix[i..i+1].parse::<u32>().unwrap();
                         let b = fix[i-1..i].parse::<u32>().unwrap();
                         res = fix[..i].to_string();
                         if a < 5 {
-                            return re_bug(self, res).clean_zero();
+                            return res.clean_zero();
                         } else if b < 9 {
                             res.pop();
                             res.push(from_digit(b+1, 10).unwrap());
-                            return re_bug(self, res);
+                            return res;
                         }
                         break;
                     }
@@ -158,13 +143,13 @@ impl Bignum for Float {
                         res.remove(res.len()-1-i);
                         if i == rev.len()-1-n {
                             res.insert_str(0+n, &(a+1).to_string());
-                            return re_bug(self, res).clean_zero();
+                            return res.clean_zero();
                         }
                         res.insert(res.len()-i, from_digit(0, 10).unwrap());
                     } else if a < 9 {
                         res.remove(res.len()-1-i);
                         res.insert(res.len()-i, from_digit(a+1, 10).unwrap());
-                        return re_bug(self, res).clean_zero();
+                        return res.clean_zero();
                     }
                     let point = rev[i+1..i+2].as_bytes();
                     if point == &[b'.'] {
@@ -174,7 +159,7 @@ impl Bignum for Float {
                     if b < 9 {
                         res.remove(res.len()-2-i);
                         res.insert(res.len()-1-i, from_digit(b+1, 10).unwrap());
-                        return re_bug(self, res).clean_zero();
+                        return res.clean_zero();
                     }
                 }
                 exit(0)
@@ -184,6 +169,63 @@ impl Bignum for Float {
 }
 
 impl Other for String {
+    fn to_fixed(&self) -> String {
+        let mut exp: i32 = 0;
+        let (mut zero, mut i_or_u) = (0, 0);
+        let (mut temp, mut res) = (String::new(), String::new());
+
+        for (i, v) in self.as_bytes().iter().enumerate() {
+            if v == &b'e' {
+                temp = self[..i].to_string();
+                exp = self[i+1..].parse::<i32>().unwrap();
+                break;
+            }
+        }
+
+        if exp == 0 { temp = self.clone() };
+        for (i, v) in temp.as_bytes().iter().enumerate() {
+            match v {
+                b'.' => {
+                    res = temp[..i].to_string();
+                    res += &temp[i+1..]; zero = 0;
+                },
+                b'-' => {
+                    if exp < 0 {
+                        i_or_u = 1
+                    } else { exp += 1 }; zero = 0;
+                },
+                b'0' => zero += 1,
+                _ => zero = 0,
+            }
+        }
+
+        if exp < 0 {
+            exp = exp.abs();
+            for _ in 0..exp {
+                res.insert(i_or_u, '0');
+                exp -= 1;
+            }
+            if i_or_u != 0 {
+                exp += 1;
+            }
+        }
+
+        if exp == 0 && res.len()-zero == 1 {
+            return res[..res.len()-zero].to_string();
+        } else if exp == 0 && res.len()-zero > 1 {
+            res = res[..res.len()-zero].to_string();
+            res.insert(1, '.');
+            return res;
+        }
+
+        let u_exp = exp as usize + 1;
+        res.insert(u_exp, '.');
+        if u_exp >= res.len()-1-zero {
+            return res[..u_exp].to_string();
+        }
+        res[..res.len()-zero].to_string()
+    }
+
     fn clean_zero(self) -> String {
         let mut find: bool = false;
         let (mut zero, mut dig) = (0, 0);
