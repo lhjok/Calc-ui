@@ -1,8 +1,8 @@
 use calc::Calc;
 use druid::widget::{CrossAxisAlignment, Flex, Label, Painter};
 use druid::{
-    theme, AppLauncher, Color, Data, Lens, LocalizedString,
-    RenderContext, Widget, WidgetExt,WindowDesc,
+    theme, AppLauncher, Color, Data, FontDescriptor, FontFamily, Lens, LocalizedString,
+    RenderContext, Widget, WidgetExt, WindowDesc,
 };
 
 #[derive(Clone, Data, PartialEq)]
@@ -13,8 +13,17 @@ enum State {
 
 #[derive(Clone, Data, Lens)]
 struct CalcState {
+    show: String,
     value: String,
     state: State
+}
+
+fn show_lens(len: String) -> String {
+    let valid = len.chars().into_iter()
+        .map(|x| x.to_string()).collect::<Vec<_>>();
+    if valid.len() > 27 {
+        valid[valid.len()-27..].concat()
+    } else { valid.concat() }
 }
 
 fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
@@ -38,11 +47,16 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
         .on_click(move |_ctx, data: &mut CalcState, _env| {
             if data.value == "0" {
                 data.value = label.clone();
+                data.show = label.clone();
                 data.state = State::Non;
             } else if let State::Set = data.state {
                 data.value += &label;
+                data.show = show_lens(data.value.clone());
                 data.state = State::Non;
-            } else { data.value += &label; }
+            } else {
+                data.value += &label;
+                data.show = show_lens(data.value.clone());
+            }
         })
 }
 
@@ -69,48 +83,74 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                 'π' => {
                     if let State::Set = data.state {
                         data.value = label.clone();
+                        data.show = label.clone();
                         data.state = State::Non;
                     } else if data.value == "0" {
                         data.value = label.clone();
-                    } else { data.value += &label; }
+                        data.show = label.clone();
+                    } else {
+                        data.value += &label;
+                        data.show = show_lens(data.value.clone());
+                    }
                 },
-                'C' => { data.value = String::from("0"); },
+                'C' => {
+                    data.value = String::from("0");
+                    data.show = String::from("0");
+                },
                 '←' => {
                     if data.value.len() == 1 {
                         data.value = String::from("0");
-                    } else { data.value.pop(); }
+                        data.show = String::from("0");
+                    } else {
+                        data.value.pop();
+                        data.show = show_lens(data.value.clone());
+                    }
                 },
                 '=' => {
                     data.state = State::Set;
                     if data.value == "0" {
                         data.value = String::from("0");
+                        data.show = String::from("0");
                     } else {
                         match Calc::new(data.value.clone()).run_round(Some(7)) {
-                            Ok(valid) => data.value = valid,
-                            Err(msg) => data.value = msg
+                            Ok(valid) => data.show = valid,
+                            Err(msg) => data.show = msg
                         }
                     }
                 },
                 '.' => {
                     if let State::Set = data.state {
                         data.value = String::from("0");
+                        data.show = String::from("0");
                         data.state = State::Non;
-                    } else { data.value += &label; }
+                    } else {
+                        data.value += &label;
+                        data.show = show_lens(data.value.clone());
+                    }
                 },
                 '(' | '−' => {
                     if data.value == "0" {
                         data.value = label.clone();
+                        data.show = label.clone();
                         data.state = State::Non;
                     } else if let State::Set = data.state {
                         data.value += &label;
+                        data.show = show_lens(data.value.clone());
                         data.state = State::Non;
-                    } else { data.value += &label; }
+                    } else {
+                        data.value += &label;
+                        data.show = show_lens(data.value.clone());
+                    }
                 },
                 _ => {
                     if let State::Set = data.state {
                         data.value += &label;
+                        data.show = show_lens(data.value.clone());
                         data.state = State::Non;
-                    } else { data.value += &label; }
+                    } else {
+                        data.value += &label;
+                        data.show = show_lens(data.value.clone());
+                    }
                 },
             }
         })
@@ -141,10 +181,15 @@ fn digit_button(digit: String) -> impl Widget<CalcState> {
         .on_click(move |_ctx, data: &mut CalcState, _env| {
             if let State::Set = data.state {
                 data.value = digit.clone();
+                data.show = digit.clone();
                 data.state = State::Non;
             } else if data.value == "0" {
                 data.value = digit.clone();
-            } else { data.value += &digit; }
+                data.show = digit.clone();
+            } else {
+                data.value += &digit;
+                data.show = show_lens(data.value.clone());
+            }
         })
 }
 
@@ -175,8 +220,9 @@ fn flex_row<T: Data>(
 
 fn build_calc() -> impl Widget<CalcState> {
     let display = Label::new(|data: &String, _env: &_| data.clone())
+        .with_font(FontDescriptor::new(FontFamily::SERIF))
         .with_text_size(28.0)
-        .lens(CalcState::value)
+        .lens(CalcState::show)
         .padding(4.0);
     Flex::column()
         .with_flex_spacer(0.2)
@@ -258,6 +304,7 @@ pub fn main() {
             .with_placeholder("Senior Calculator")
         );
     let calc_state = CalcState {
+        show: String::from("0"),
         value: String::from("0"),
         state: State::Non
     };

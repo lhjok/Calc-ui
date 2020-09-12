@@ -25,7 +25,7 @@ lazy_static! {
     static ref MAX: Float = {
         let max = Float::parse("1e+768").unwrap();
         Float::with_val(2560, max)
-    }; 
+    };
     static ref MIN: Float = {
         let min = Float::parse("-1e+768").unwrap();
         Float::with_val(2560, min)
@@ -304,8 +304,8 @@ impl Calc {
         let num = &self.numbers;
         let ope = &self.operator;
         let math = ["abs","cos","sin","tan","csc","sec","cot","coth",
-        "cosh","sinh","tanh","sech","ln","csch","acos","asin","atan",
-        "acosh","asinh","atanh","exp","log","logx","sqrt","cbrt","fac"];
+            "cosh","sinh","tanh","sech","ln","csch","acos","asin","atan",
+            "acosh","asinh","atanh","exp","log","logx","sqrt","cbrt","fac"];
         let expr = self.expression.replace("π", "P")
             .replace(" ", "").replace("÷", "/").replace("×", "*");
         let mut mark: u8 = b'I'; // I = Init, C = Char, N = Number, F = Func, P = Pi
