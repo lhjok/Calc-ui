@@ -117,8 +117,8 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                         data.show = String::from("0");
                     } else {
                         match Calc::new(oper_repl(data.value.clone())).run_round(Some(7)) {
-                            Ok(valid) => data.show = valid,
-                            Err(msg) => data.show = msg
+                            Ok(valid) => { data.value = valid.clone(); data.show = valid },
+                            Err(msg) => { data.value = msg.clone(); data.show = msg }
                         }
                     }
                 },
