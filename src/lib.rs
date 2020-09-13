@@ -303,11 +303,10 @@ impl Calc {
     pub fn run(&self) -> Result<Float, String> {
         let num = &self.numbers;
         let ope = &self.operator;
+        let expr = &self.expression;
         let math = ["abs","cos","sin","tan","csc","sec","cot","coth",
             "cosh","sinh","tanh","sech","ln","csch","acos","asin","atan",
             "acosh","asinh","atanh","exp","log","logx","sqrt","cbrt","fac"];
-        let expr = self.expression.replace("π", "P")
-            .replace(" ", "").replace("÷", "/").replace("×", "*");
         let mut mark: u8 = b'I'; // I = Init, C = Char, N = Number, F = Func, P = Pi
         let mut locat: usize = 0;
         let mut bracket: u32 = 0;

@@ -1,8 +1,8 @@
 use calc::Calc;
 use druid::widget::{CrossAxisAlignment, Flex, Label, Painter};
 use druid::{
-    theme, AppLauncher, Color, Data, FontDescriptor, FontFamily, Lens, LocalizedString,
-    RenderContext, Widget, WidgetExt, WindowDesc,
+    theme, AppLauncher, Color, Data, FontDescriptor, FontFamily, FontWeight, Lens,
+    LocalizedString, RenderContext, Widget, WidgetExt, WindowDesc,
 };
 
 #[derive(Clone, Data, PartialEq)]
@@ -21,9 +21,13 @@ struct CalcState {
 fn show_lens(len: String) -> String {
     let valid = len.chars().into_iter()
         .map(|x| x.to_string()).collect::<Vec<_>>();
-    if valid.len() > 27 {
-        valid[valid.len()-27..].concat()
+    if valid.len() > 23 {
+        valid[valid.len()-23..].concat()
     } else { valid.concat() }
+}
+
+fn oper_repl(repl: String) -> String {
+    repl.replace("÷", "/").replace("×", "*")
 }
 
 fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
@@ -112,7 +116,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                         data.value = String::from("0");
                         data.show = String::from("0");
                     } else {
-                        match Calc::new(data.value.clone()).run_round(Some(7)) {
+                        match Calc::new(oper_repl(data.value.clone())).run_round(Some(7)) {
                             Ok(valid) => data.show = valid,
                             Err(msg) => data.show = msg
                         }
@@ -220,8 +224,10 @@ fn flex_row<T: Data>(
 
 fn build_calc() -> impl Widget<CalcState> {
     let display = Label::new(|data: &String, _env: &_| data.clone())
-        .with_font(FontDescriptor::new(FontFamily::SERIF))
-        .with_text_size(28.0)
+        .with_font(FontDescriptor::with_weight(
+            FontDescriptor::new(FontFamily::SERIF),
+            FontWeight::BOLD))
+        .with_text_size(30.0)
         .lens(CalcState::show)
         .padding(4.0);
     Flex::column()
