@@ -54,8 +54,8 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
                 data.show = label.clone();
                 data.state = State::Non;
             } else if let State::Set = data.state {
-                data.value += &label;
-                data.show = show_lens(data.value.clone());
+                data.value = label.clone();
+                data.show = label.clone();
                 data.state = State::Non;
             } else {
                 data.value += &label;
