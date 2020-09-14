@@ -49,14 +49,13 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
         .background(painter)
         .expand()
         .on_click(move |_ctx, data: &mut CalcState, _env| {
-            if data.value == "0" {
+            if let State::Set = data.state {
                 data.value = label.clone();
                 data.show = label.clone();
                 data.state = State::Non;
-            } else if let State::Set = data.state {
+            } else if data.value == "0" {
                 data.value = label.clone();
                 data.show = label.clone();
-                data.state = State::Non;
             } else {
                 data.value += &label;
                 data.show = show_lens(data.value.clone());
