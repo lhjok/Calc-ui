@@ -1,5 +1,5 @@
 use calc::Calc;
-use druid::widget::{CrossAxisAlignment, Flex, Label, Painter};
+use druid::widget::{ CrossAxisAlignment, Flex, Label, Painter };
 use druid::{
     theme, AppLauncher, Color, Data, FontDescriptor, FontFamily, FontWeight, Lens,
     LocalizedString, RenderContext, Widget, WidgetExt, WindowDesc,
@@ -21,8 +21,8 @@ struct CalcState {
 fn show_lens(len: String) -> String {
     let valid = len.chars().into_iter()
         .map(|x| x.to_string()).collect::<Vec<_>>();
-    if valid.len() > 23 {
-        valid[valid.len()-23..].concat()
+    if valid.len() > 25 {
+        valid[valid.len()-25..].concat()
     } else { valid.concat() }
 }
 
@@ -44,6 +44,9 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
     });
 
     Label::new(fun.to_string())
+        .with_font(FontDescriptor::with_weight(
+            FontDescriptor::new(FontFamily::new_unchecked("Noto-Color-Emoji")),
+            FontWeight::BOLD))
         .with_text_size(16.)
         .center()
         .background(painter)
@@ -77,6 +80,9 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
     });
 
     Label::new(op.clone().to_string())
+        .with_font(FontDescriptor::with_weight(
+            FontDescriptor::new(FontFamily::new_unchecked("Noto-Color-Emoji")),
+            FontWeight::BOLD))
         .with_text_size(24.)
         .center()
         .background(painter)
@@ -177,6 +183,9 @@ fn digit_button(digit: String) -> impl Widget<CalcState> {
     });
 
     Label::new(digit.clone())
+        .with_font(FontDescriptor::with_weight(
+            FontDescriptor::new(FontFamily::new_unchecked("Noto-Color-Emoji")),
+            FontWeight::BOLD))
         .with_text_size(24.)
         .center()
         .background(painter)
@@ -224,11 +233,11 @@ fn flex_row<T: Data>(
 fn build_calc() -> impl Widget<CalcState> {
     let display = Label::new(|data: &String, _env: &_| data.clone())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::SERIF),
+            FontDescriptor::new(FontFamily::new_unchecked("Consolas")),
             FontWeight::BOLD))
-        .with_text_size(30.0)
+        .with_text_size(28.0)
         .lens(CalcState::show)
-        .padding(4.0);
+        .padding(5.0);
     Flex::column()
         .with_flex_spacer(0.2)
         .with_child(display)
@@ -302,7 +311,7 @@ fn build_calc() -> impl Widget<CalcState> {
 
 pub fn main() {
     let window = WindowDesc::new(build_calc)
-        .window_size((392., 300.))
+        .window_size((392., 305.))
         .resizable(false)
         .title(
             LocalizedString::new("calc-window-title")
