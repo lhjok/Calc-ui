@@ -245,7 +245,7 @@ fn build_calc() -> impl Widget<CalcState> {
         .cross_axis_alignment(CrossAxisAlignment::End)
         .with_flex_child(
             flex_row(
-                op_button_label('∧', String::from("^")),
+                op_button('^'),
                 op_button('('),
                 op_button(')'),
                 op_button('÷'),
