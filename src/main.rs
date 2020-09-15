@@ -45,7 +45,7 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
 
     Label::new(fun.to_string())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::new_unchecked("Noto-Color-Emoji")),
+            FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
             FontWeight::BOLD))
         .with_text_size(16.)
         .center()
@@ -81,7 +81,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
 
     Label::new(op.clone().to_string())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::new_unchecked("Noto-Color-Emoji")),
+            FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
             FontWeight::BOLD))
         .with_text_size(24.)
         .center()
@@ -184,7 +184,7 @@ fn digit_button(digit: String) -> impl Widget<CalcState> {
 
     Label::new(digit.clone())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::new_unchecked("Noto-Color-Emoji")),
+            FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
             FontWeight::BOLD))
         .with_text_size(24.)
         .center()
