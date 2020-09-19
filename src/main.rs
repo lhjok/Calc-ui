@@ -45,8 +45,8 @@ fn fun_button_label(fun: &str, label: String) -> impl Widget<CalcState> {
 
     Label::new(fun.to_string())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
-            FontWeight::BOLD))
+                FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
+                FontWeight::BOLD))
         .with_text_size(16.)
         .center()
         .background(painter)
@@ -81,27 +81,14 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
 
     Label::new(op.clone().to_string())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
-            FontWeight::BOLD))
+                FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
+                FontWeight::BOLD))
         .with_text_size(24.)
         .center()
         .background(painter)
         .expand()
         .on_click(move |_ctx, data: &mut CalcState, _env| {
             match op {
-                'π' => {
-                    if let State::Set = data.state {
-                        data.value = label.clone();
-                        data.show = label.clone();
-                        data.state = State::Non;
-                    } else if data.value == "0" {
-                        data.value = label.clone();
-                        data.show = label.clone();
-                    } else {
-                        data.value += &label;
-                        data.show = show_lens(data.value.clone());
-                    }
-                },
                 'C' => {
                     data.value = String::from("0");
                     data.show = String::from("0");
@@ -117,10 +104,7 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                 },
                 '=' => {
                     data.state = State::Set;
-                    if data.value == "0" {
-                        data.value = String::from("0");
-                        data.show = String::from("0");
-                    } else {
+                    if data.value != "0" {
                         match Calc::new(oper_repl(data.value.clone())).run_round(Some(7)) {
                             Ok(valid) => { data.value = valid.clone(); data.show = show_lens(valid) },
                             Err(msg) => { data.value = String::from("0"); data.show = msg }
@@ -137,18 +121,27 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                         data.show = show_lens(data.value.clone());
                     }
                 },
-                '(' | '−' => {
-                    if data.value == "0" {
-                        data.value = label.clone();
-                        data.show = label.clone();
-                        data.state = State::Non;
-                    } else if let State::Set = data.state {
-                        data.value += &label;
-                        data.show = show_lens(data.value.clone());
-                        data.state = State::Non;
-                    } else {
-                        data.value += &label;
-                        data.show = show_lens(data.value.clone());
+                ch @ '(' | ch @ '−' | ch @ 'π' => {
+                    match data.state {
+                        State::Set => {
+                            data.state = State::Non;
+                            if ch == '−' && data.value != "0" {
+                                data.value += &label;
+                                data.show = show_lens(data.value.clone());
+                            } else {
+                                data.value = label.clone();
+                                data.show = label.clone();
+                            }
+                        },
+                        State::Non => {
+                            if data.value == "0" {
+                                data.value = label.clone();
+                                data.show = label.clone();
+                            } else {
+                                data.value += &label;
+                                data.show = show_lens(data.value.clone());
+                            }
+                        }
                     }
                 },
                 _ => {
@@ -184,8 +177,8 @@ fn digit_button(digit: String) -> impl Widget<CalcState> {
 
     Label::new(digit.clone())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
-            FontWeight::BOLD))
+                FontDescriptor::new(FontFamily::new_unchecked("Cantarell")),
+                FontWeight::BOLD))
         .with_text_size(24.)
         .center()
         .background(painter)
@@ -233,8 +226,8 @@ fn flex_row<T: Data>(
 fn build_calc() -> impl Widget<CalcState> {
     let display = Label::new(|data: &String, _env: &_| data.clone())
         .with_font(FontDescriptor::with_weight(
-            FontDescriptor::new(FontFamily::new_unchecked("Consolas")),
-            FontWeight::BOLD))
+                FontDescriptor::new(FontFamily::new_unchecked("Consolas")),
+                FontWeight::BOLD))
         .with_text_size(28.0)
         .lens(CalcState::show)
         .padding(5.0);
