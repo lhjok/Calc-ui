@@ -122,26 +122,21 @@ fn op_button_label(op: char, label: String) -> impl Widget<CalcState> {
                     }
                 },
                 ch @ '(' | ch @ '−' | ch @ 'π' => {
-                    match data.state {
-                        State::Set => {
-                            data.state = State::Non;
-                            if ch == '−' && data.value != "0" {
-                                data.value += &label;
-                                data.show = show_lens(data.value.clone());
-                            } else {
-                                data.value = label.clone();
-                                data.show = label.clone();
-                            }
-                        },
-                        State::Non => {
-                            if data.value == "0" {
-                                data.value = label.clone();
-                                data.show = label.clone();
-                            } else {
-                                data.value += &label;
-                                data.show = show_lens(data.value.clone());
-                            }
+                    if let State::Set = data.state {
+                        data.state = State::Non;
+                        if ch == '−' && data.value != "0" {
+                            data.value += &label;
+                            data.show = show_lens(data.value.clone());
+                        } else {
+                            data.value = label.clone();
+                            data.show = label.clone();
                         }
+                    } else if data.value == "0" {
+                        data.value = label.clone();
+                        data.show = label.clone();
+                    } else {
+                        data.value += &label;
+                        data.show = show_lens(data.value.clone());
                     }
                 },
                 _ => {
